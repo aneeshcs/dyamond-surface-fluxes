@@ -70,6 +70,12 @@ cd dyamond-surface-fluxes
 pip install --user -e ".[maps]"
 ```
 
+> **Note:** SciServer containers do not persist `pip install --user` (`~/.local`)
+> across container restarts — rerun the install (and restart the notebook kernel)
+> after creating or restarting a container. As a safety net, each notebook's first
+> cell falls back to importing the package directly from the repo's `src/` tree if
+> the install is missing.
+
 Locally (for development and unit tests; no data access required):
 
 ```bash

@@ -9,7 +9,6 @@ from __future__ import annotations
 
 from typing import Any
 
-import cmocean
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
@@ -19,11 +18,17 @@ from .grid import bin_to_latlon, subset_bbox
 __all__ = ["FLUX_CMAPS", "plot_global", "plot_region"]
 
 # Diverging colormap for signed fluxes (positive down = ocean warming),
-# sequential for positive-definite fields such as shortwave.
-FLUX_CMAPS: dict[str, Any] = {
-    "diverging": cmocean.cm.balance,
-    "sequential": cmocean.cm.thermal,
-}
+# sequential for positive-definite fields such as shortwave. cmocean is
+# optional so the package imports in minimal environments.
+try:
+    import cmocean
+
+    FLUX_CMAPS: dict[str, Any] = {
+        "diverging": cmocean.cm.balance,
+        "sequential": cmocean.cm.thermal,
+    }
+except ImportError:
+    FLUX_CMAPS = {"diverging": "RdBu_r", "sequential": "inferno"}
 
 
 def _get_geoaxes(figsize: tuple[float, float], projection: str | None):
