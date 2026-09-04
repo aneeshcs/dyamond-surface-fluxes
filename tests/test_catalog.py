@@ -61,6 +61,26 @@ def test_open_store_relative_and_consolidated_fallback(fake_root):
     assert "oceQnet" in ds1 and "EFLUX" in ds2
 
 
+def test_list_stores_skips_unreadable_subtrees(fake_root, tmp_path):
+    """Restricted staging areas on the shared volume (mode 000) must be skipped,
+    not crash the walk — regression for PermissionError on poseidon-DYAMOND."""
+    import os
+    import stat
+
+    if os.geteuid() == 0:
+        pytest.skip("permissions are not enforced for root")
+
+    restricted = tmp_path / "LLC4320v2_incoming"
+    (restricted / "lst").mkdir(parents=True)
+    (restricted / "lst" / ".zgroup").write_text("{}")
+    restricted.chmod(0o000)
+    try:
+        stores = sorted(s.name for s in list_stores())
+        assert stores == ["flx.zarr", "surface.zarr"]
+    finally:
+        restricted.chmod(stat.S_IRWXU)  # allow pytest tmp_path cleanup
+
+
 def test_find_stores_with(fake_root):
     hits = find_stores_with(["oceQnet", "EFLUX", "HFLUX"])
     by_name = {path.name: vars_ for path, vars_ in hits.items()}

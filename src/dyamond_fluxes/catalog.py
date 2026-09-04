@@ -30,9 +30,12 @@ __all__ = [
 
 
 def _has_content(path: Path) -> bool:
-    """True if ``path`` is a directory with at least one entry (an unmounted volume
-    leaves an empty stub directory behind, which must not count as found)."""
-    return path.is_dir() and any(path.iterdir())
+    """True if ``path`` is a readable directory with at least one entry (an unmounted
+    volume leaves an empty stub directory behind, which must not count as found)."""
+    try:
+        return path.is_dir() and any(path.iterdir())
+    except OSError:
+        return False
 
 
 def dyamond_root() -> Path:
@@ -60,10 +63,18 @@ def dyamond_root() -> Path:
 
 
 def _is_zarr_store(path: Path) -> bool:
-    """Detect a Zarr store root: v2 markers (.zgroup/.zmetadata/.zattrs) or v3 (zarr.json)."""
-    return any(
-        (path / marker).exists() for marker in (".zgroup", ".zmetadata", ".zattrs", "zarr.json")
-    )
+    """Detect a Zarr store root: v2 markers (.zgroup/.zmetadata/.zattrs) or v3 (zarr.json).
+
+    Unreadable paths (e.g., restricted staging areas on the shared ceph volume)
+    are reported as non-stores rather than raising.
+    """
+    try:
+        return any(
+            (path / marker).exists()
+            for marker in (".zgroup", ".zmetadata", ".zattrs", "zarr.json")
+        )
+    except OSError:
+        return False
 
 
 def list_stores(root: str | Path | None = None, max_depth: int = 3) -> list[Path]:
@@ -87,8 +98,8 @@ def list_stores(root: str | Path | None = None, max_depth: int = 3) -> list[Path
             return
         try:
             subdirs = sorted(p for p in d.iterdir() if p.is_dir())
-        except PermissionError:
-            return
+        except OSError:
+            return  # unreadable directory: skip this subtree, keep searching elsewhere
         for sub in subdirs:
             _walk(sub, depth + 1)
 
