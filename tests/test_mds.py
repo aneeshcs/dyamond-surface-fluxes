@@ -59,8 +59,12 @@ def test_open_2d_variable_values_and_time(fake_mit):
     assert da.time.values[0] == np.datetime64("2020-01-19T21:00:00")
     assert da.time.values[1] - da.time.values[0] == np.timedelta64(3600, "s")
     assert list(da.iteration.values) == [0, 80, 160]
-    # Sign convention attrs attached for the flux machinery
+    # Sign convention attrs attached for the flux machinery: MDS fluxes are
+    # positive-down, so to_positive_down must infer that and leave values unchanged.
+    from dyamond_fluxes.fluxes import to_positive_down
+
     assert "+=down" in da.attrs["long_name"]
+    np.testing.assert_array_equal(to_positive_down(da).isel(time=1).values, fake_mit[80])
 
 
 def test_open_3d_variable_shape(fake_mit):

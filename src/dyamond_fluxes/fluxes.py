@@ -26,8 +26,16 @@ __all__ = [
     "area_weighted_mean",
 ]
 
-_UP_HINTS = ("upward", "positive up", "+ up", "up=+")
-_DOWN_HINTS = ("downward", "positive down", "+ down", "down=+", "into the ocean", ">0 increases")
+_UP_HINTS = ("upward", "positive up", "+ up", "up=+", "+=up")
+_DOWN_HINTS = (
+    "downward",
+    "positive down",
+    "+ down",
+    "down=+",
+    "+=down",  # MITgcm diagnostics notation
+    "into the ocean",
+    ">0 increases",
+)
 
 
 def to_positive_down(da: xr.DataArray, assume_upward: bool | None = None) -> xr.DataArray:
