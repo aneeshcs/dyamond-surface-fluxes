@@ -15,6 +15,7 @@ dependencies = [
     "xarray>=2023.1",
     "dask[distributed]>=2023.1",
     "zarr>=2.14",
+    "netcdf4>=1.6",
     "matplotlib>=3.7",
     "cmocean>=3.0",
 ]
