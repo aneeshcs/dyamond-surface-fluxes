@@ -1,0 +1,22 @@
+# Thin environment for SciServer (Oceanography compute image) or local use.
+# On SciServer most of the scientific stack is preinstalled; the recommended
+# setup there is simply:
+#   pip install --user -e ".[maps]"
+name: dyamond-fluxes
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.10
+  - numpy>=1.24
+  - xarray>=2023.1
+  - dask>=2023.1
+  - distributed
+  - zarr>=2.14
+  - matplotlib>=3.7
+  - cmocean
+  - cartopy>=0.22
+  - jupyterlab
+  - pytest
+  - pip
+  - pip:
+      - -e .
