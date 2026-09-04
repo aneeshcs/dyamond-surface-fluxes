@@ -16,6 +16,9 @@ from pathlib import Path
 import xarray as xr
 
 DEFAULT_ROOTS = (
+    # C1440-LLC2160 is the coupled GEOS-MITgcm DYAMOND configuration; the data
+    # was migrated here from poseidon_ceph/DYAMOND (now an empty root-owned stub).
+    "/home/idies/workspace/poseidon-DYAMOND/C1440-LLC2160_incoming",
     "/home/idies/workspace/poseidon-DYAMOND",
     "/home/idies/workspace/poseidon_ceph/DYAMOND",
 )
