@@ -1,9 +1,11 @@
 """Discovery and opening of DYAMOND Zarr stores on SciServer.
 
 The coupled GEOS-MITgcm (c1440-LLC2160) DYAMOND output lives on the SciServer
-Kraken domain at ``/home/idies/workspace/poseidon_ceph/DYAMOND`` as Zarr v2
-stores. Set the environment variable ``DYAMOND_ROOT`` to point elsewhere
-(e.g., a small local test subset).
+Kraken domain as Zarr v2 stores. The mount point has varied: the access
+instructions cite ``poseidon_ceph/DYAMOND``, but containers may instead mount a
+dedicated read-only filesystem at ``poseidon-DYAMOND`` — both are tried. Set the
+environment variable ``DYAMOND_ROOT`` to point elsewhere (e.g., a small local
+test subset).
 """
 
 from __future__ import annotations
@@ -13,10 +15,13 @@ from pathlib import Path
 
 import xarray as xr
 
-DEFAULT_ROOT = "/home/idies/workspace/poseidon_ceph/DYAMOND"
+DEFAULT_ROOTS = (
+    "/home/idies/workspace/poseidon-DYAMOND",
+    "/home/idies/workspace/poseidon_ceph/DYAMOND",
+)
 
 __all__ = [
-    "DEFAULT_ROOT",
+    "DEFAULT_ROOTS",
     "dyamond_root",
     "list_stores",
     "open_store",
@@ -24,16 +29,34 @@ __all__ = [
 ]
 
 
+def _has_content(path: Path) -> bool:
+    """True if ``path`` is a directory with at least one entry (an unmounted volume
+    leaves an empty stub directory behind, which must not count as found)."""
+    return path.is_dir() and any(path.iterdir())
+
+
 def dyamond_root() -> Path:
-    """Return the DYAMOND data root (``DYAMOND_ROOT`` env var, else the SciServer path)."""
-    root = Path(os.environ.get("DYAMOND_ROOT", DEFAULT_ROOT))
-    if not root.exists():
-        raise FileNotFoundError(
-            f"DYAMOND root {root} not found. This analysis must run on SciServer "
-            "(Kraken domain, Oceanography image, 'Poseidon DYAMOND (ceph)' data volume), "
-            "or set DYAMOND_ROOT to a local subset. See README for access instructions."
-        )
-    return root
+    """Return the DYAMOND data root.
+
+    ``DYAMOND_ROOT`` (env var) takes precedence; otherwise the known SciServer
+    mount points are tried in order, skipping empty stub directories.
+    """
+    env = os.environ.get("DYAMOND_ROOT")
+    if env is not None:
+        root = Path(env)
+        if not root.exists():
+            raise FileNotFoundError(f"DYAMOND_ROOT is set to {root}, which does not exist.")
+        return root
+    for candidate in DEFAULT_ROOTS:
+        root = Path(candidate)
+        if _has_content(root):
+            return root
+    raise FileNotFoundError(
+        f"No DYAMOND data found at any of {DEFAULT_ROOTS}. This analysis must run on "
+        "SciServer (Kraken domain, Oceanography image, with the Poseidon DYAMOND data "
+        "volume attached at container creation), or set DYAMOND_ROOT to a local subset. "
+        "See README for access instructions."
+    )
 
 
 def _is_zarr_store(path: Path) -> bool:

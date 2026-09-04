@@ -28,7 +28,9 @@ download. Following the
    - **Domain**: Kraken
    - **Compute Image**: Oceanography
    - **Data Volume**: Poseidon DYAMOND (ceph)
-3. The data appear at `/home/idies/workspace/poseidon_ceph/DYAMOND` (Zarr v2).
+3. The data appear at `/home/idies/workspace/poseidon-DYAMOND` (a dedicated read-only
+   ceph filesystem; older instructions cite `/home/idies/workspace/poseidon_ceph/DYAMOND`,
+   and `dyamond_root()` tries both).
 
 The official access demo lives in
 [`hainegroup/Poseidon-share`](https://github.com/hainegroup/Poseidon-share)

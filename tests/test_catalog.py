@@ -26,6 +26,26 @@ def test_dyamond_root_env_override(fake_root):
 
 def test_dyamond_root_missing_path_raises(monkeypatch):
     monkeypatch.setenv("DYAMOND_ROOT", "/nonexistent/dyamond")
+    with pytest.raises(FileNotFoundError, match="does not exist"):
+        dyamond_root()
+
+
+def test_dyamond_root_skips_empty_stub_and_falls_through(tmp_path, monkeypatch):
+    """An unmounted volume leaves an empty stub dir; the next candidate must win."""
+    from dyamond_fluxes import catalog
+
+    stub = tmp_path / "poseidon_ceph" / "DYAMOND"  # exists but empty
+    stub.mkdir(parents=True)
+    real = tmp_path / "poseidon-DYAMOND"
+    real.mkdir()
+    (real / "some_store").mkdir()
+
+    monkeypatch.delenv("DYAMOND_ROOT", raising=False)
+    monkeypatch.setattr(catalog, "DEFAULT_ROOTS", (str(stub), str(real)))
+    assert dyamond_root() == real
+
+    # With only the empty stub available, a clear error is raised.
+    monkeypatch.setattr(catalog, "DEFAULT_ROOTS", (str(stub),))
     with pytest.raises(FileNotFoundError, match="SciServer"):
         dyamond_root()
 
