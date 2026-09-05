@@ -12,8 +12,14 @@ from .geos import (
 )
 from .grid import bin_to_latlon, faces_in_bbox, rotate_uv_to_east_north, subset_bbox
 from .mds import list_mit_variables, open_grid, open_mds_variable, open_ocean_dataset
+from .swabsorb import (
+    backout_surface_sw,
+    infer_reference_depth,
+    interface_fractions,
+    sw_fraction,
+)
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 __all__ = [
     # catalog (zarr stores / local subsets)
@@ -43,4 +49,9 @@ __all__ = [
     "rotate_uv_to_east_north",
     "faces_in_bbox",
     "subset_bbox",
+    # shortwave penetration (Paulson-Simpson / swfrac.F)
+    "sw_fraction",
+    "infer_reference_depth",
+    "interface_fractions",
+    "backout_surface_sw",
 ]

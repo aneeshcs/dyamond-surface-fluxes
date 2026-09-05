@@ -103,6 +103,7 @@ Zarr stores (e.g., a small extracted subset) to run elsewhere.
 | `notebooks/03_regional_zoom.ipynb` | Gulf Stream and Kuroshio zooms at native ~2–4 km resolution |
 | `notebooks/04_qsw_validation.ipynb` | July-2020 monthly-mean GEOS net surface SW (`SWGNT`) vs. CERES EBAF Ed4.2 (bias map, zonal means, area-weighted stats) |
 | `notebooks/05_qsw_diagnostics.ipynb` | Probe-point diagnosis of raw `oceQsw`: established it carries only ~12% of the surface net SW (penetrating component) |
+| `notebooks/06_backout_surface_sw.ipynb` | Recover $SW_{surf} = \mathtt{oceQsw}/c$ exactly via the swfrac.F two-band constant: regression for $c$, interface ID from `DRF`, 3-D deposition profile |
 
 Run the notebooks in order: notebook 00 records the GEOS flux variable names and
 collections that notebook 02's `FLUX_SOURCES` mapping must match.
@@ -122,7 +123,10 @@ collections that notebook 02's `FLUX_SOURCES` mapping must match.
   readme's description. `oceQnet` contains the full shortwave and is verified healthy
   (night ≈ +200 W m⁻² upward, clear-noon plunge ≈ −450 to −560 at an equatorial Pacific
   probe). Use the GEOS net surface shortwave for radiation work; treat
-  $Q_{ns} = Q_{net} - \\mathtt{oceQsw}$ as biased by the missing SW.
+  $Q_{ns} = Q_{net} - \\mathtt{oceQsw}$ as biased by the missing SW. Because MITgcm's
+  `swfrac.F` two-band profile is independent of zenith angle and clouds, the surface
+  flux is exactly recoverable as `oceQsw` divided by one constant (`swabsorb.py`,
+  notebook 06).
 - **Grids differ.** Cross-grid comparison uses area-weighted bin-averaging of cell-center
   values to a common regular grid — conservative in the mean and dependency-free, adequate
   at 0.25°–1° target resolution.
