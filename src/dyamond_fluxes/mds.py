@@ -44,6 +44,14 @@ MITGCM_DIAG_ATTRS: dict[str, dict[str, str]] = {
     "oceQsw": {
         "long_name": "net upward shortwave radiation, >0 decreases theta",
         "units": "W m-2",
+        "comment": (
+            "WARNING: despite the readme description, this stream carries only "
+            "~12% of the true surface net SW (July 2020, vs CERES and vs the "
+            "diurnal range of oceQnet) with a smooth zenith-only signature - "
+            "consistent with a sub-surface penetrating-SW component, not the "
+            "surface flux. Use GEOS SWGNT for surface net shortwave; oceQnet "
+            "itself contains the full shortwave and is healthy. See notebook 05."
+        ),
     },
     "oceFWflx": {
         "long_name": "net upward freshwater flux, >0 increases salinity",

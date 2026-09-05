@@ -101,8 +101,8 @@ Zarr stores (e.g., a small extracted subset) to run elsewhere.
 | `notebooks/01_ocean_fluxes_global.ipynb` | Global snapshot maps of $Q_{net}$, $Q_{sw}$, $Q_{ns}$ |
 | `notebooks/02_qnet_decomposition.ipynb` | GEOS component decomposition and closure vs. `oceQnet` on a 1° grid |
 | `notebooks/03_regional_zoom.ipynb` | Gulf Stream and Kuroshio zooms at native ~2–4 km resolution |
-| `notebooks/04_qsw_validation.ipynb` | July-2020 monthly-mean $Q_{sw}$ vs. CERES EBAF Ed4.2 surface net SW (bias map, zonal means, area-weighted stats) |
-| `notebooks/05_qsw_diagnostics.ipynb` | Diagnose raw `oceQsw` content: probe-point hourly series (day/night fingerprint), snapshot statistics and map |
+| `notebooks/04_qsw_validation.ipynb` | July-2020 monthly-mean GEOS net surface SW (`SWGNT`) vs. CERES EBAF Ed4.2 (bias map, zonal means, area-weighted stats) |
+| `notebooks/05_qsw_diagnostics.ipynb` | Probe-point diagnosis of raw `oceQsw`: established it carries only ~12% of the surface net SW (penetrating component) |
 
 Run the notebooks in order: notebook 00 records the GEOS flux variable names and
 collections that notebook 02's `FLUX_SOURCES` mapping must match.
@@ -116,6 +116,13 @@ collections that notebook 02's `FLUX_SOURCES` mapping must match.
   `fluxes.to_positive_down` reads the direction from them (it refuses to guess when
   ambiguous). GEOS/MERRA-2 conventions: `SWGNT`/`LWGNT` positive down, `EFLUX`/`HFLUX`
   positive up — confirm against the `long_name`s printed by notebook 00.
+- **`oceQsw` is not the surface net shortwave.** Empirically (notebook 05, July 2020)
+  the stream holds ~12% of the true surface net SW with a smooth zenith-only diurnal
+  signature — consistent with a sub-surface penetrating-SW component, despite the
+  readme's description. `oceQnet` contains the full shortwave and is verified healthy
+  (night ≈ +200 W m⁻² upward, clear-noon plunge ≈ −450 to −560 at an equatorial Pacific
+  probe). Use the GEOS net surface shortwave for radiation work; treat
+  $Q_{ns} = Q_{net} - \\mathtt{oceQsw}$ as biased by the missing SW.
 - **Grids differ.** Cross-grid comparison uses area-weighted bin-averaging of cell-center
   values to a common regular grid — conservative in the mean and dependency-free, adequate
   at 0.25°–1° target resolution.
