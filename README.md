@@ -109,12 +109,13 @@ collections that notebook 02's `FLUX_SOURCES` mapping must match.
 
 ## Physical conventions and caveats
 
-- **Sign conventions differ between components.** The raw MDS files carry no metadata, so
-  `mds.py` attaches the standard MITgcm diagnostics attributes (`oceQnet`/`oceQsw` are
-  positive **down**, warming the ocean); `fluxes.to_positive_down` reads direction from
-  those attributes and refuses to guess when ambiguous. GEOS/MERRA-2 conventions:
-  `SWGNT`/`LWGNT` positive down, `EFLUX`/`HFLUX` positive up — confirm against the
-  `long_name`s printed by notebook 00.
+- **Sign conventions differ between components.** Per `mit/readme.txt`, this dataset
+  stores the ocean-side fluxes positive **upward** (`oceQnet`/`oceQsw`: ">0 decreases
+  theta") — the opposite of the MITgcm diagnostics-package default. The raw MDS files
+  carry no metadata, so `mds.py` attaches the readme's descriptions as attributes and
+  `fluxes.to_positive_down` reads the direction from them (it refuses to guess when
+  ambiguous). GEOS/MERRA-2 conventions: `SWGNT`/`LWGNT` positive down, `EFLUX`/`HFLUX`
+  positive up — confirm against the `long_name`s printed by notebook 00.
 - **Grids differ.** Cross-grid comparison uses area-weighted bin-averaging of cell-center
   values to a common regular grid — conservative in the mean and dependency-free, adequate
   at 0.25°–1° target resolution.

@@ -5,11 +5,12 @@ Sign conventions
 All quantities returned by this module use **positive downward** (into the
 ocean; a positive net heat flux warms the ocean), in W m^-2.
 
-- MITgcm diagnostics: ``oceQnet`` (net surface heat flux incl. shortwave) and
-  ``oceQsw`` (net shortwave). The upward/downward convention differs between
-  MITgcm configurations, so :func:`to_positive_down` inspects variable
-  attributes rather than hard-coding a sign. Verify against the store metadata
-  (notebook 00) before trusting bulk statistics.
+- MITgcm side: in this dataset ``oceQnet`` (net surface heat flux incl.
+  shortwave) and ``oceQsw`` (net shortwave) are stored positive **upward**
+  (">0 decreases theta", per ``mit/readme.txt``) — the opposite of the MITgcm
+  diagnostics-package default. :func:`to_positive_down` inspects variable
+  attributes (attached by ``mds.py`` from the readme) rather than hard-coding
+  a sign.
 - GEOS/MERRA-2 conventions: ``EFLUX`` (latent) and ``HFLUX`` (sensible) are
   positive **upward** (ocean -> atmosphere); ``SWGNT`` and ``LWGNT`` (net
   surface shortwave/longwave radiation) are positive **downward**.
@@ -26,15 +27,15 @@ __all__ = [
     "area_weighted_mean",
 ]
 
-_UP_HINTS = ("upward", "positive up", "+ up", "up=+", "+=up")
+_UP_HINTS = ("upward", "positive up", "+ up", "up=+", "+=up", ">0 decreases theta")
 _DOWN_HINTS = (
     "downward",
     "positive down",
     "+ down",
     "down=+",
-    "+=down",  # MITgcm diagnostics notation
+    "+=down",  # MITgcm diagnostics-package notation
     "into the ocean",
-    ">0 increases",
+    ">0 increases theta",  # keep 'theta' — 'oceFWflx: >0 increases salinity' is upward
 )
 
 

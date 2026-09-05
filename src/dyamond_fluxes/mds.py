@@ -10,7 +10,8 @@ The float width is detected from the file size.
 
 Time base: the coupled run starts 2020-01-19 21:00 UTC with a 45 s ocean
 timestep, so ``time = T0 + iteration * 45 s`` (hourly output = 80 iterations).
-Verify against ``mit/readme.txt`` on first use.
+Confirmed by ``mit/readme.txt``: timesteps 0-829200 span
+2020-01-19 21:00 to 2021-03-26 18:00 UTC.
 """
 
 from __future__ import annotations
@@ -29,33 +30,39 @@ LLC_N = 2160  # points per face side for LLC2160
 OCEAN_T0 = np.datetime64("2020-01-19T21:00:00")
 OCEAN_DT_SECONDS = 45
 
-# Standard MITgcm diagnostics metadata (from the model's available_diagnostics
-# conventions). Raw .data files carry no attributes, so these supply the units
-# and — critically — the sign convention consumed by fluxes.to_positive_down.
+# Variable metadata transcribed from mit/readme.txt in the staging area
+# (verified 2026-09). Raw .data files carry no attributes, so these supply the
+# units and — critically — the sign convention consumed by
+# fluxes.to_positive_down. NOTE: unlike the MITgcm diagnostics-package default,
+# this dataset stores the surface fluxes positive **upward** (>0 cools/salts
+# the ocean).
 MITGCM_DIAG_ATTRS: dict[str, dict[str, str]] = {
     "oceQnet": {
-        "long_name": "net surface heat flux into the ocean (+=down), >0 increases theta",
+        "long_name": "net upward surface heat flux (including shortwave), >0 decreases theta",
         "units": "W m-2",
     },
     "oceQsw": {
-        "long_name": "net short-wave radiation (+=down), >0 increases theta",
+        "long_name": "net upward shortwave radiation, >0 decreases theta",
         "units": "W m-2",
     },
     "oceFWflx": {
-        "long_name": "net surface fresh-water flux into the ocean (+=down), >0 decreases salinity",
+        "long_name": "net upward freshwater flux, >0 increases salinity",
         "units": "kg m-2 s-1",
     },
     "oceSflux": {
-        "long_name": "net surface salt flux into the ocean (+=down)",
+        "long_name": "net upward salt flux, >0 decreases salinity",
         "units": "g m-2 s-1",
     },
-    "oceTAUX": {"long_name": "zonal surface wind stress, >0 increases uVel", "units": "N m-2"},
-    "oceTAUY": {
-        "long_name": "meridional surface wind stress, >0 increases vVel",
+    "oceTAUX": {
+        "long_name": "zonal (grid-relative) surface wind stress, >0 increases uVel",
         "units": "N m-2",
     },
-    "Eta": {"long_name": "surface height anomaly", "units": "m"},
-    "KPPhbl": {"long_name": "KPP boundary layer depth", "units": "m"},
+    "oceTAUY": {
+        "long_name": "meridional (grid-relative) surface wind stress, >0 increases vVel",
+        "units": "N m-2",
+    },
+    "Eta": {"long_name": "sea surface height anomaly", "units": "m"},
+    "KPPhbl": {"long_name": "KPP mixing layer depth", "units": "m"},
 }
 
 # Grid files in mit/grid -> the names the rest of the package expects.
@@ -160,7 +167,7 @@ def open_mds_variable(
         attrs=dict(MITGCM_DIAG_ATTRS.get(name, {})),
     )
     da.time.attrs["comment"] = (
-        f"time = {OCEAN_T0} + iteration * {OCEAN_DT_SECONDS} s; verify against mit/readme.txt"
+        f"time = {OCEAN_T0} + iteration * {OCEAN_DT_SECONDS} s; confirmed by mit/readme.txt"
     )
     return da
 

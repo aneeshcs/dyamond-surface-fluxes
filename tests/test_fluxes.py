@@ -30,6 +30,18 @@ class TestToPositiveDown:
         np.testing.assert_allclose(to_positive_down(da, assume_upward=True).values, [-2.0])
         np.testing.assert_allclose(to_positive_down(da, assume_upward=False).values, [2.0])
 
+    def test_dyamond_readme_wordings(self):
+        # Exact conventions documented in mit/readme.txt: all upward, but
+        # oceFWflx says ">0 increases salinity" which must not trip the
+        # ">0 increases theta" down-hint.
+        for text in (
+            "net upward surface heat flux (including shortwave), >0 decreases theta",
+            "net upward shortwave radiation, >0 decreases theta",
+            "net upward freshwater flux, >0 increases salinity",
+        ):
+            da = _da([3.0], long_name=text)
+            np.testing.assert_allclose(to_positive_down(da).values, [-3.0])
+
     def test_ambiguous_metadata_raises(self):
         with pytest.raises(ValueError, match="sign convention"):
             to_positive_down(_da([1.0], long_name="mystery flux"))
