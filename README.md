@@ -102,6 +102,7 @@ Zarr stores (e.g., a small extracted subset) to run elsewhere.
 | `notebooks/02_qnet_decomposition.ipynb` | GEOS component decomposition and closure vs. `oceQnet` on a 1° grid |
 | `notebooks/03_regional_zoom.ipynb` | Gulf Stream and Kuroshio zooms at native ~2–4 km resolution |
 | `notebooks/04_qsw_validation.ipynb` | July-2020 monthly-mean $Q_{sw}$ vs. CERES EBAF Ed4.2 surface net SW (bias map, zonal means, area-weighted stats) |
+| `notebooks/05_qsw_diagnostics.ipynb` | Diagnose raw `oceQsw` content: probe-point hourly series (day/night fingerprint), snapshot statistics and map |
 
 Run the notebooks in order: notebook 00 records the GEOS flux variable names and
 collections that notebook 02's `FLUX_SOURCES` mapping must match.
